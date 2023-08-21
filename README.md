@@ -9,6 +9,16 @@ Service to manage users
 3. Run `npm start`
 4. Application should be running at http://localhost:3000
 
+Using docker
+
+```bash
+# build the container
+$ docker build . -t ut-user-service
+
+# run the container
+$ docker run -d -p 3000:3000 ut-user-service
+```
+
 ## Example
 
 1. Creating user
