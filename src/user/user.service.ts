@@ -2,14 +2,13 @@ import {
   ConflictException,
   HttpException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserRole } from './entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -24,7 +23,7 @@ export class UserService {
         throw new ConflictException('User already exists');
       }
       const newUser = {
-        id: uuidv4(),
+        id: v4(),
         ...createUserDto,
         role: UserRole.USER,
       };
