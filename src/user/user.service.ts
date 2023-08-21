@@ -14,7 +14,7 @@ import { v4 } from 'uuid';
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  create(createUserDto: CreateUserDto) {
+  create(createUserDto: CreateUserDto): User {
     try {
       const existingUser = global.userStore.find(
         (user: User) => user.email === createUserDto.email,
@@ -36,7 +36,7 @@ export class UserService {
     }
   }
 
-  findAll() {
+  findAll(): User[] {
     try {
       return global.userStore;
     } catch (error) {
@@ -45,16 +45,21 @@ export class UserService {
     }
   }
 
-  findOne(id: string) {
+  findOne(id: string): User {
     try {
-      return global.userStore.find((user: User) => user.id === id);
+      const user = global.userStore.find((user: User) => user.id === id);
+      if (user) {
+        return user;
+      } else {
+        throw new NotFoundException(`User ${id} not found`);
+      }
     } catch (error) {
       this.logger.error(`Failed to find user ${id}: ${error.message}`);
       throw new HttpException(error.message, error.status);
     }
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  update(id: string, updateUserDto: UpdateUserDto): User {
     try {
       const user = global.userStore.find((user: User) => user.id === id);
       if (user) {
@@ -76,7 +81,7 @@ export class UserService {
     }
   }
 
-  remove(id: string) {
+  remove(id: string): void {
     try {
       global.userStore = global.userStore.filter(
         (user: User) => user.id !== id,

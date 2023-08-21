@@ -23,7 +23,7 @@ describe('UserService', () => {
     expect(userService).toBeDefined();
   });
 
-  describe('create', () => {
+  describe('create, retrieve, update and delete users', () => {
     const createUserDto = { email: 'test@example.com', name: 'Test User' };
 
     it('should create a user', () => {
@@ -33,7 +33,6 @@ describe('UserService', () => {
         role: UserRole.USER,
       };
       const loggerSpy = jest.spyOn(Logger.prototype, 'debug');
-
       const result = userService.create(createUserDto);
 
       expect(result).toEqual(createdUser);
@@ -43,7 +42,11 @@ describe('UserService', () => {
     });
 
     it('should throw ConflictException if user already exists', () => {
+      const loggerSpy = jest.spyOn(Logger.prototype, 'error');
       expect(() => userService.create(createUserDto)).toThrow(HttpException);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Failed to create user:User already exists',
+      );
     });
 
     it('should find all users', () => {
@@ -70,6 +73,16 @@ describe('UserService', () => {
       expect(result).toEqual(mockUser);
     });
 
+    it('should throw NotFoundException if user does not exists', () => {
+      const loggerSpy = jest.spyOn(Logger.prototype, 'error');
+      expect(() => userService.findOne('uuid-not-found')).toThrow(
+        HttpException,
+      );
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Failed to find user uuid-not-found: User uuid-not-found not found',
+      );
+    });
+
     it('should update user with age', () => {
       const mockUser = {
         id: 'mocked-uuid',
@@ -80,6 +93,16 @@ describe('UserService', () => {
       };
       const result = userService.update('mocked-uuid', { age: 20 });
       expect(result).toEqual(mockUser);
+    });
+
+    it('should throw NotFoundException if user does not exists', () => {
+      const loggerSpy = jest.spyOn(Logger.prototype, 'error');
+      expect(() => userService.update('uuid-not-found', { age: 20 })).toThrow(
+        HttpException,
+      );
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Failed to update user uuid-not-found: User uuid-not-found not found',
+      );
     });
 
     it('should remove user', () => {
